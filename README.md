@@ -1,8 +1,6 @@
 # SPAN-SPLASH
 
-An image viewing interface which pulls images from [Unsplash.com](https://unsplash.com/).
-
-(Built keyboard-first)
+A `keyboard-first` image viewing interface which pulls images from [Unsplash.com](https://unsplash.com/).
 
 ## Setup
 
