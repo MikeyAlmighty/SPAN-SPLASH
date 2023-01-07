@@ -1,8 +1,7 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import SideBar from '@components/side-bar'
 import Content from '@components/content'
-import { selectionStore } from '@components/store/selection'
 
 import './index.css'
 
@@ -16,7 +15,16 @@ enum Direction {
 
 const App = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
-  const handleKeyPress = (event) => {
+  const [imageWidth, setImageWidth] = useState<number>(0)
+
+
+  // Calc screenWidth
+  const screenWidth = window.innerWidth
+  console.log(screenWidth )
+
+  // We need to get the height and width of the Image (child) component
+
+  const handleKeyPress = (event: KeyboardEvent) => {
     const { key } = event
 
     event.preventDefault()
@@ -50,7 +58,7 @@ const App = () => {
 
   return (
       <main className="flex bg-stone-500 w-screen h-screen">
-        {/* <SideBar /> */}
+        <SideBar isOpen={selectedIndex < 0} />
         <Content selectedIndex={selectedIndex} />
       </main>
   )
