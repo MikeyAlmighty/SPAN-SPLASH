@@ -10,7 +10,7 @@ import './index.css'
 const App = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
   const [selectedTopic, setSelectedTopic] = useState<{ index: number, id: string }>({ index: 0 })
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true)
+  const [isNavOpen, setIsNavOpen] = useState<boolean>(true)
 
   const [topicData, setTopicData] = useState<Array<{ id: string, name: string }>>([])
 
@@ -45,14 +45,14 @@ const App = () => {
 
     switch (key) {
         case Direction.UP: {
-          if (isSidebarOpen) break
-          if (selectedIndex < colCount) setIsSidebarOpen(true)
+          if (isNavOpen) break
+          if (selectedIndex < colCount) setIsNavOpen(true)
           setSelectedIndex(selectedIndex - colCount)
           break
         }
 
         case Direction.RIGHT: {
-          if (isSidebarOpen) {
+          if (isNavOpen) {
             setSelectedTopic({ index: selectedTopic?.index + 1 })
             break
           }
@@ -68,9 +68,7 @@ const App = () => {
           if ((selectedIndex + colCount) >= colCount * rowCount) {
             break
           }
-          if (isSidebarOpen) {
-            setIsSidebarOpen(false)
-          }
+          if (isNavOpen) setIsNavOpen(false)
           setSelectedIndex(selectedIndex + colCount)
           break;
         }
@@ -80,7 +78,7 @@ const App = () => {
             console.log('retreive prev column')
             break
           }
-          if (isSidebarOpen) {
+          if (isNavOpen) {
             setSelectedTopic({ index: selectedTopic?.index - 1 })
             break
           }
@@ -88,7 +86,7 @@ const App = () => {
           break
         }
     }
-  }, [selectedIndex, isSidebarOpen, selectedTopic.index])
+  }, [selectedIndex, isNavOpen, selectedTopic.index])
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress);
@@ -104,7 +102,7 @@ const App = () => {
         topics={topicData}
         onTopicChange={(index: number) => setSelectedTopic(index)}
         selectedTopic={selectedTopic}
-        isOpen={isSidebarOpen}
+        isOpen={isNavOpen}
       />
       <Content
         colCount={colCount}
