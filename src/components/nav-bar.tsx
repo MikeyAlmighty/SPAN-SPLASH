@@ -17,11 +17,16 @@ const NavBar = ({
 }: NavBarProps) => (
   <>
     {isOpen && (
-      <motion.aside
-        className="w-screen z-10 border-2 border-yellow-600" aria-label="Navbar"
+      <motion.div
+        onKeyPress={() => console.log('sidebar hit')}
+        className="absolute w-screen z-10 border-2 border-yellow-600" aria-label="Navbar"
+        initial={{ opacity: 0 }}
         animate={{
-          position: 'absolute',
-          transition: { duration: 1 },
+          opacity: 1,
+          transition: {
+            ease: "easeInOut",
+            duration: 0.25
+          },
         }}
       >
         <div className="p-4 bg-stone-500 overflow-y-auto bg-stone-600 dark:bg-gray-800">
@@ -40,7 +45,7 @@ const NavBar = ({
           ))}
         </ul>
         </div>
-    </motion.aside>
+    </motion.div>
   )}
   </>
 )

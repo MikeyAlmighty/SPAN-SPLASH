@@ -9,7 +9,6 @@ import './index.css'
 
 const App = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
-  const [imageWidth, setImageWidth] = useState<number>(0)
   const [selectedTopic, setSelectedTopic] = useState<{ index: number, id: string }>({ index: 0 })
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true)
 
@@ -103,7 +102,7 @@ const App = () => {
     <main className="flex w-screen h-screen overflow-y-hidden">
       <Navbar
         topics={topicData}
-        onTopicChange={(index) => setSelectedTopic(index)}
+        onTopicChange={(index: number) => setSelectedTopic(index)}
         selectedTopic={selectedTopic}
         isOpen={isSidebarOpen}
       />
