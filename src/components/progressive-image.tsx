@@ -7,7 +7,7 @@ type ImageProps = ImageModel & {
   selectedIndex: number
 }
 
-export const Image = ({ currentIndex, selectedIndex, url }: ImageProps) => {
+export const ProgressiveImage = ({ currentIndex, selectedIndex }: ImageProps) => {
   const [mockPhoto, setMockPhoto] = useState<{ id: string, url: string }>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -32,7 +32,7 @@ export const Image = ({ currentIndex, selectedIndex, url }: ImageProps) => {
         <img
           alt={''}
           className={`rounded ${selectedIndex < 0 ?  'grayscale-[100%]' : null} ${currentIndex === selectedIndex ? "border-yellow-600 border-4" : null}`}
-          src={url}
+          src={'https://random.imagecdn.app/500/350'}
           /* src={mockPhoto?.url} */
          />) :
        (
@@ -44,4 +44,4 @@ export const Image = ({ currentIndex, selectedIndex, url }: ImageProps) => {
   )
 }
 
-export default Image
+export default ProgressiveImage
