@@ -42,7 +42,7 @@ const App = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        await fetch(`https://picsum.photos/v2/list?page=1&limit=${colCount * rowCount}`)
+        await fetch(`https://picsum.photos/v2/list?page=3&limit=${colCount * rowCount}`)
           .then((response) => response.json())
 
           .then((data) => (data?.map(({ id, download_url: url }, index) => ({ index, url }))))
@@ -55,13 +55,14 @@ const App = () => {
   }, [])
 
   const getNextImages = async () => {
-    await fetch(`https://picsum.photos/v2/list?page=3&limit=${rowCount}`)
+    await fetch(`https://picsum.photos/v2/list?page=2&limit=${rowCount}`)
       .then((response) => response.json())
-      .then((data) => (data?.map(({ id, download_url: url }, index) => ({ index: index +  imageData.length, url }))))
+      .then((data) => (data?.map(({ id, download_url: url }, index) => ({ index: index + imageData.length + 1, url }))))
       .then((newData) => {
         // const firstColumn = imageData.filter((_, index) => (index % colCount === 0)) // column which will get removed, potentially add to list for previous navigation
         const filtered = imageData.filter((_, index) => (index % colCount !== 0))
-        setImageData([...filtered, ...newData])
+        const toUpdate = [...filtered, ...newData]
+        setImageData(toUpdate)
       })
   }
 
