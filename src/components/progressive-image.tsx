@@ -1,45 +1,22 @@
-import { useState, useEffect } from "react"
-
-import { ImageModel } from "@models/image"
-
-type ImageProps = ImageModel & {
-  currentIndex: number
-  selectedIndex: number
+type ProgressiveImageProps = {
+  currentRowIndex: number
+  currentColIndex: number
+  selectedPosition: {
+    row: number
+    col: number
+  }
 }
 
-export const ProgressiveImage = ({ currentIndex, selectedIndex }: ImageProps) => {
-  const [mockPhoto, setMockPhoto] = useState<{ id: string, url: string }>()
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-
-  useEffect(() => {
-    const getData = async() => {
-      try {
-        await fetch(`https://picsum.photos/seed/picsum/info`)
-          .then((response) => response.json())
-          .then(({ id, download_url: url }) => setMockPhoto({ id, url }))
-        setIsLoading(false)
-      } catch(error) {
-        console.error(error)
-        throw new Error(error)
-      }
-    }
-    getData()
-  }, [])
-
+export const ProgressiveImage = ({ currentRowIndex, currentColIndex, selectedPosition }: ProgressiveImageProps) => {
+  const { row: selectedRow, col: selectedCol } = selectedPosition
+  const active = currentRowIndex === selectedRow && currentColIndex === selectedCol
   return (
-    <div className='m-14 w-96 h-64 rounded bg-stone-600 border-1'>
-      {!isLoading ? (
-        <img
-          alt={''}
-          className={`rounded ${selectedIndex < 0 ?  'grayscale-[100%]' : null} ${currentIndex === selectedIndex ? "border-yellow-600 border-4" : null}`}
-          src={'https://random.imagecdn.app/500/350'}
-          /* src={mockPhoto?.url} */
-         />) :
-       (
-         <p className='place-content-center'>Loading....</p>
-       )
-      }
-      <p>{currentIndex}</p>
+    <div className={`m-14 w h-64 ${active ? 'border-2 border-yellow-600' : null } rounded bg-stone-600 border-1`}>
+      <img
+        alt={''}
+        placeholder='loading'
+        src={'https://picsum.photos/440/278'}
+      />
     </div>
   )
 }
