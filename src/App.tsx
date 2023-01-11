@@ -18,7 +18,8 @@ const App = () => {
 
   const [topicData, setTopicData] = useState<Array<string>>([])
   const [selectedTopic, setSelectedTopic] = useState<{ index: number, name: string }>({ index: 0 })
-  const [isNavOpen, setIsNavOpen] = useState<boolean>(true)
+
+  const [imageData, setImageData] = useState<Array<string>>([])
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -34,31 +35,19 @@ const App = () => {
     navbarRef.current?.focus()
   }, [])
 
-  // const getNextImages = async () => {
-  //  await fetch(`https://picsum.photos/v2/list?page=2&limit=${rowCount}`)
-  //   .then((response) => response.json())
-  //   .then((data) => (data?.map(({ id, download_url: url }, index) => ({ index: index + imageData.length + 1, url }))))
-  //   .then((newData) => {
-  //     // const firstColumn = imageData.filter((_, index) => (index % colCount === 0)) // column which will get removed, potentially add to list for previous navigation
-  //     const filtered = imageData.filter((_, index) => (index % colCount !== 0))
-  //     const toUpdate = [...filtered, ...newData]
-  //     setImageData(toUpdate)
-  //   })
-  // }
-
   return (
     <main className="flex flex-col w-screen h-screen overflow-y-hidden">
       <Navbar
-        isOpen={isNavOpen}
         ref={navbarRef}
         topics={topicData}
-        navMovement={() => gridRef.current?.focus()}
+        onFocusLost={() => gridRef.current?.focus()}
         onTopicChange={(topic) => setSelectedTopic(topic)}
       />
       <Grid
         ref={gridRef}
+        onFocusLost={() => navbarRef.current?.focus()}
+        images={imageData}
         rowCount={rowCount}
-        gridMovement={() => navbarRef.current?.focus()}
         colCount={colCount}
       />
     </main>

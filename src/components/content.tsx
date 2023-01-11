@@ -14,14 +14,14 @@ const Content = ({ selectedIndex, images, amount, topicId, colCount }: ContentPr
        <div
          className={`flex z-0 bg-stone-500 justify-around flex-wrap border-1 border-yellow-600`}
        >
-           {images.map(({  id, url }, index) => (
+         {images.map(({  id, url }, index) => (
            <Image
              key={index}
              currentIndex={index}
              url={url}
              selectedIndex={selectedIndex}
            />
-        ))}
+         ))}
      </div>
    )
 }
