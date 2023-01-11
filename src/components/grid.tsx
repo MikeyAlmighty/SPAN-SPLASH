@@ -21,19 +21,35 @@ const Grid = forwardRef(({
 
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
-
   const fetchImage = async () => {
-    return await fetch( `https://picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
-      .then((response) => response.json())
-      .then(({ id, download_url:url }) => ({ colIndex, rowIndex, url, id }))
-  }
+    console.log('next image: ', imageData)
+
+    const newImages = await Promise.all(Array.from({ length: rowCount }).map(async(_, rowIndex) => {
+      return await fetch( `https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
+          .then((response) => response.json())
+          .then(({ id, download_url:url }) => ({ colIndex: colCount, rowIndex, url, id }))
+    }))
+    console.log('newImages: ', newImages)
+
+    const newData = imageData.map((column, rowIndex) => {
+      return column.reduce((accum, current, colIndex) => {
+          if (colIndex === 0) return accum
+        if (colIndex === colCount) return [...accum, newImages[rowIndex]]
+          return  [...accum, current]
+        }, [])
+      })
+    console.log('settingNewData: ', newData)
+    setImageData(newData)
+   }
 
   useEffect(() => {
    const getImageData = async () => {
       try {
         const gridData = Array.from({ length: rowCount }).map(async(_, rowIndex) => {
           return Promise.all(Array.from({ length: colCount }).map(async(_, colIndex) => {
-            await fetchImage()
+            return await fetch( `https://picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
+              .then((response) => response.json())
+              .then(({ id, download_url:url }) => ({ colIndex, rowIndex, url, id }))
           }))
         })
         const resolvedData = await Promise.all(gridData)
@@ -65,6 +81,7 @@ const Grid = forwardRef(({
         // Higher Horizontal Boundry
         if (selectedPosition.col === colCount - 1) {
           console.log('nextImage')
+          fetchImage()
           setShouldFetchNext(true)
           break
         }
