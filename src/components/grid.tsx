@@ -6,7 +6,6 @@ import { Direction } from '@models/direction'
 type GridProps = {
   rowCount: number
   colCount: number
-  images: Array<string>
   onFocusLost: () => void
 }
 
@@ -14,10 +13,8 @@ const Grid = forwardRef(({
   colCount,
   rowCount,
   onFocusLost,
-  images = []
 }: GridProps, ref) => {
   const [selectedPosition, setSelectedPositon] = useState<{ row: number, col: number }>({ row: 0, col: 0 })
-  const [shouldFetchNext, setShouldFetchNext] = useState<boolean>(false)
 
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
@@ -80,7 +77,6 @@ const Grid = forwardRef(({
         if (selectedPosition.col === colCount - 1) {
           console.log('nextImage')
           fetchImage()
-          setShouldFetchNext(true)
           break
         }
         setSelectedPositon(({ col, row }) => ({ col: col + 1, row }))

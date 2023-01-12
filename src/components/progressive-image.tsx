@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 type ProgressiveImageProps = {
   currentRowIndex: number
   currentColIndex: number
-  shouldFetchNext: boolean
   imageSrc: string
   selectedPosition: {
     row: number
@@ -17,7 +15,6 @@ export const ProgressiveImage = ({
   currentColIndex,
   selectedPosition,
   imageSrc,
-  shouldFetchNext
 }: ProgressiveImageProps) => {
   const { row: selectedRow, col: selectedCol } = selectedPosition
   const active = (currentRowIndex === selectedRow) && (currentColIndex === selectedCol)

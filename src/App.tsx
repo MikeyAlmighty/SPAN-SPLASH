@@ -19,8 +19,6 @@ const App = () => {
   const [topicData, setTopicData] = useState<Array<string>>([])
   const [selectedTopic, setSelectedTopic] = useState<{ index: number, name: string }>({ index: 0 })
 
-  const [imageData, setImageData] = useState<Array<string>>([])
-
   useEffect(() => {
     const fetchTopics = async () => {
       try {
@@ -46,7 +44,6 @@ const App = () => {
       <Grid
         ref={gridRef}
         onFocusLost={() => navbarRef.current?.focus()}
-        images={imageData}
         rowCount={rowCount}
         colCount={colCount}
       />
