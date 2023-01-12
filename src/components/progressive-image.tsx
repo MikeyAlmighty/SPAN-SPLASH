@@ -20,7 +20,7 @@ export const ProgressiveImage = ({
   const active = (currentRowIndex === selectedRow) && (currentColIndex === selectedCol)
 
   return (
-    <div className='w-84 h-64'>
+    <div className='w-84 h-64 m-14'>
       <motion.img
         initial={{ scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -28,7 +28,7 @@ export const ProgressiveImage = ({
           scale: 1.2
         }}
         alt={''}
-        className={`m-14 w-84 h-64 ${active ? 'border-yellow-600' : null } border-2 rounded bg-stone-600 border-1`}
+        className={`w-full h-full ${active ? 'border-yellow-600' : null } border-2 rounded bg-stone-600 border-1`}
         src={imageSrc}
       />
     </div>
