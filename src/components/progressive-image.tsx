@@ -32,7 +32,6 @@ export const ProgressiveImage = ({
         }}
         alt={''}
         className={`m-14 w-84 h-64 ${active ? 'border-yellow-600' : null } border-2 rounded bg-stone-600 border-1`}
-        placeholder='loading'
         src={imageSrc}
       />
     </div>

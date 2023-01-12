@@ -22,34 +22,32 @@ const Grid = forwardRef(({
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
   const fetchImage = async () => {
-    console.log('next image: ', imageData)
-
-    const newImages = await Promise.all(Array.from({ length: rowCount }).map(async(_, rowIndex) => {
-      return await fetch( `https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
-          .then((response) => response.json())
-          .then(({ id, download_url:url }) => ({ colIndex: colCount, rowIndex, url, id }))
+    const newImages = await Promise.all(Array.from({ length: rowCount }).map(async (_, rowIndex) => {
+      return await fetch(`https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
+        .then((response) => response.json())
+        .then(({ id, download_url: url }) => ({ colIndex: colCount, rowIndex, url, id }))
     }))
-    console.log('newImages: ', newImages)
 
     const newData = imageData.map((column, rowIndex) => {
       return column.reduce((accum, current, colIndex) => {
-          if (colIndex === 0) return accum
+        if (colIndex === 0) return accum // "Remove" images from first column
         if (colIndex === colCount) return [...accum, newImages[rowIndex]]
-          return  [...accum, current]
-        }, [])
-      })
-    console.log('settingNewData: ', newData)
-    setImageData(newData)
-   }
+        return [...accum, current]
+      }, [])
+    })
+
+    setImageData(newData.map((col, index) => ([...col, newImages[index]]))) // Add newImages to last column
+    setSelectedPositon({ col: 0, row: 0 })
+  }
 
   useEffect(() => {
-   const getImageData = async () => {
+    const getImageData = async () => {
       try {
-        const gridData = Array.from({ length: rowCount }).map(async(_, rowIndex) => {
-          return Promise.all(Array.from({ length: colCount }).map(async(_, colIndex) => {
-            return await fetch( `https://picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
+        const gridData = Array.from({ length: rowCount }).map(async (_, rowIndex) => {
+          return Promise.all(Array.from({ length: colCount }).map(async (_, colIndex) => {
+            return await fetch(`https://picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
               .then((response) => response.json())
-              .then(({ id, download_url:url }) => ({ colIndex, rowIndex, url, id }))
+              .then(({ id, download_url: url }) => ({ colIndex, rowIndex, url, id }))
           }))
         })
         const resolvedData = await Promise.all(gridData)
