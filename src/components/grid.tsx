@@ -2,10 +2,12 @@ import { forwardRef, useState, useCallback, useEffect } from 'react'
 
 import ProgressiveImage from "@components/progressive-image"
 import { Direction } from '@models/direction'
+import { TopicModel } from '@models/topics'
 
 type GridProps = {
   rowCount: number
   colCount: number
+  selectedTopic: TopicModel
   onFocusLost: () => void
 }
 
@@ -13,49 +15,77 @@ const Grid = forwardRef(({
   colCount,
   rowCount,
   onFocusLost,
+  selectedTopic
 }: GridProps, ref) => {
   const [selectedPosition, setSelectedPositon] = useState<{ row: number, col: number }>({ row: 0, col: 0 })
 
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
-  const fetchImage = async () => {
-    const newImages = await Promise.all(Array.from({ length: rowCount }).map(async (_, rowIndex) => {
-      return await fetch(`https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
-        .then((response) => response.json())
-        .then(({ id, download_url: url }) => ({ colIndex: colCount, rowIndex, url, id }))
-    }))
-
-    const newData = imageData.map((column, rowIndex) => {
-      return column.reduce((accum, current, colIndex) => {
-        if (colIndex === 0) return accum // "Remove" images from first column
-        if (colIndex === colCount) return [...accum, newImages[rowIndex]]
-        return [...accum, current]
-      }, [])
+  const fetchImages = useCallback(async (rowIndex: number, signal?: AbortSignal) => {
+      const response = await fetch(`https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`,{
+      signal,
     })
 
-    setImageData(newData.map((col, index) => ([...col, newImages[index]]))) // Add newImages to last column
-    setSelectedPositon({ col: 0, row: 0 })
-  }
+    const data = await response.json()
+    const { id, download_url: url } = data
+    return { colIndex: colCount, rowIndex, url, id }
+  }, [colCount, selectedTopic?.id])
 
   useEffect(() => {
+    const abortController = new AbortController()
     const getImageData = async () => {
       try {
-        const gridData = Array.from({ length: rowCount }).map(async (_, rowIndex) => {
-          return Promise.all(Array.from({ length: colCount }).map(async (_, colIndex) => {
-            return await fetch(`https://picsum.photos/id/${Math.floor(Math.random() * 99)}/info`)
-              .then((response) => response.json())
-              .then(({ id, download_url: url }) => ({ colIndex, rowIndex, url, id }))
-          }))
-        })
+        const gridData = await Promise.all(Array.from({ length: rowCount }).map(async (_, rowIndex) => (
+          await Promise.all(Array.from({ length: colCount }).map(() => (
+            fetchImages(rowIndex, abortController.signal))))
+        )))
         const resolvedData = await Promise.all(gridData)
         setImageData(resolvedData)
-
+        return () => abortController.abort()
       } catch (error) {
         console.error(error)
       }
     }
-    getImageData()
-  }, [])
+    selectedTopic?.title && getImageData()
+  }, [selectedTopic?.title, colCount, fetchImages, rowCount])
+
+
+  const fetchBackward = async () => {
+    const newImages = await Promise.all(
+      Array.from({ length: rowCount  }).map(async (_, rowIndex) => (
+        await fetchImages(rowIndex)
+    )))
+
+    const newData = imageData.map((rows) => {
+      return rows.reduce((accum, currentCol, colIndex) => {
+        if (colIndex + 1 === colCount) return accum
+        return [...accum, { ...currentCol, colIndex: colIndex - 1 }]
+      }, [])
+    })
+
+    // Add newImages to first column
+    setImageData(newData.map((col, index) => ([newImages[index],...col])))
+    setSelectedPositon({ col: colCount - 1, row: 0 })
+  }
+
+  const fetchForward = async () => {
+    const newImages = await Promise.all(
+      Array.from({ length: rowCount  }).map(async (_, rowIndex) => (
+        await fetchImages(rowIndex)
+    )))
+
+    const newData = imageData.map((rows, rowIndex) => {
+      return rows.reduce((accum, currentCol, colIndex) => {
+        // "Remove" images from first column
+        if (colIndex === 0) return accum
+        if (colIndex === colCount) return [...accum, newImages[rowIndex]]
+        return [...accum, currentCol]
+      }, [])
+    })
+    // Add newImages to last column
+    setImageData(newData.map((col, index) => ([...col, newImages[index]])))
+    setSelectedPositon({ col: 0, row: 0 })
+  }
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const { key } = event
@@ -75,8 +105,7 @@ const Grid = forwardRef(({
       case Direction.RIGHT: {
         // Higher Horizontal Boundry
         if (selectedPosition.col === colCount - 1) {
-          console.log('nextImage')
-          fetchImage()
+          fetchForward()
           break
         }
         setSelectedPositon(({ col, row }) => ({ col: col + 1, row }))
@@ -94,15 +123,14 @@ const Grid = forwardRef(({
       case Direction.LEFT: {
         // Lower Horizontal Boundry
         if (selectedPosition.col === 0) {
-          console.log('prevImage')
+          fetchBackward()
           break
         }
-
         setSelectedPositon(({ col, row }) => ({ col: col - 1, row }))
         break
       }
     }
-  }, [onFocusLost, selectedPosition?.col, selectedPosition?.row])
+  }, [onFocusLost, selectedPosition?.col, selectedPosition?.row, fetchBackward, fetchForward, rowCount, colCount])
 
   return (
     <div
@@ -113,7 +141,7 @@ const Grid = forwardRef(({
     >
       {imageData.map((column, rowIndex) => (
         <div key={`row-${rowIndex}`} className='table-row'>
-          {column.map(({ id, url }, colIndex) => (
+          {column.map(({ url }, colIndex) => (
             <div key={`row-${rowIndex}-col-${colIndex}`} className='table-cell'>
               <ProgressiveImage
                 imageSrc={url}

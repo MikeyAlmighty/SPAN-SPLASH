@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import Navbar from '@components/nav-bar'
 import Grid from '@components/grid'
 
+import { TopicModel } from '@models/topics'
+
 import './index.css'
 
 const App = () => {
@@ -17,20 +19,26 @@ const App = () => {
   const colCount = Math.floor(screenWidth / 440)
 
   const [topicData, setTopicData] = useState<Array<string>>([])
-  const [selectedTopic, setSelectedTopic] = useState<{ index: number, name: string }>({ index: 0 })
+  const [selectedTopic, setSelectedTopic] = useState<TopicModel>({ index: 0 })
 
   useEffect(() => {
+    const abortController = new AbortController()
     const fetchTopics = async () => {
       try {
-        await fetch('https://random-word-api.herokuapp.com/word?number=10')
-          .then((response) => response.json())
-          .then(topics => setTopicData(topics))
+        const response = await fetch('https://random-word-api.herokuapp.com/word?number=10', {
+          signal: abortController.signal
+        })
+        const data = await response.json()
+        setTopicData(data)
+        setSelectedTopic({ index: 0, title: data[0] })
       } catch (error) {
         console.error(error)
       }
     }
     fetchTopics()
     navbarRef.current?.focus()
+
+    return () => abortController.abort()
   }, [])
 
   return (
@@ -43,6 +51,7 @@ const App = () => {
       />
       <Grid
         ref={gridRef}
+        selectedTopic={selectedTopic}
         onFocusLost={() => navbarRef.current?.focus()}
         rowCount={rowCount}
         colCount={colCount}

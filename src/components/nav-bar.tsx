@@ -1,12 +1,11 @@
 import { useState, forwardRef } from 'react'
-import { motion } from "framer-motion"
 
 import { Direction } from '@models/direction'
 
 type NavBarProps = {
   topics: Array<string>
   onFocusLost: () => void
-  onTopicChange: ({ index, name }: { index: number, name: string }) => void
+  onTopicChange: ({ index, title }: { index: number, title: string }) => void
 }
 
 const MAX_TOPIC_COUNT = 10
@@ -34,7 +33,7 @@ const NavBar = forwardRef(({
         // Upper Boundry
         if (currentIndex === MAX_TOPIC_COUNT) break;
         setSelectedTopicIndex(currentIndex)
-        onTopicChange({ name: topics[currentIndex], index: currentIndex })
+        onTopicChange({ ...topics[currentIndex], index: currentIndex })
         break
       }
       case Direction.LEFT: {
@@ -42,7 +41,7 @@ const NavBar = forwardRef(({
         // Lower Boundry
         if (currentIndex < MIN_TOPIC_COUNT) break;
         setSelectedTopicIndex(currentIndex)
-        onTopicChange({ name: topics[currentIndex], index: currentIndex })
+        onTopicChange({ ...topics[currentIndex], index: currentIndex })
         break
       }
     }
@@ -58,14 +57,14 @@ const NavBar = forwardRef(({
     >
       <div className="p-4 overflow-y-auto bg-stone-600">
         <ul className="py-6 flex justify-between">
-          {topics?.map((name, index) => (
-            <li key={name} className='p-4'>
+          {topics?.map((title, index) => (
+            <li key={index} className='p-4'>
               <a
-                href={`#${name}`}
-                onClick={() => onTopicChange({ index, name })}
+                href={`#${title}`}
+                onClick={() => onTopicChange({ index, title })}
                 className={`text-center ${selectedTopicIndex === index ? "bg-yellow-600" : null} p-2 font-bold text-white rounded hover:bg-yellow-600`}
               >
-                <span className="ml-3">{name}</span>
+                <span className="ml-3">{title}</span>
               </a>
             </li>
           ))}
