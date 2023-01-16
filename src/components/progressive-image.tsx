@@ -14,7 +14,7 @@ export const ProgressiveImage = ({
   currentRowIndex,
   currentColIndex,
   selectedPosition,
-  imageSrc,
+  imageSrc
 }: ProgressiveImageProps) => {
   const { row: selectedRow, col: selectedCol } = selectedPosition
   const active = (currentRowIndex === selectedRow) && (currentColIndex === selectedCol)
@@ -28,7 +28,7 @@ export const ProgressiveImage = ({
           scale: 1.2
         }}
         alt={''}
-        className={`w-full h-full ${active ? 'border-yellow-600' : null } border-2 rounded bg-stone-600 border-1`}
+        className={`w-full h-full ${active ? 'border-yellow-600' : null} border-2 rounded bg-stone-600 border-1`}
         src={imageSrc}
       />
     </div>

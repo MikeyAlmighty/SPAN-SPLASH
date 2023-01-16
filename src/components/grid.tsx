@@ -1,6 +1,6 @@
 import { forwardRef, useState, useCallback, useEffect } from 'react'
 
-import ProgressiveImage from "@components/progressive-image"
+import ProgressiveImage from '@components/progressive-image'
 import { Direction } from '@models/direction'
 import { TopicModel } from '@models/topics'
 
@@ -22,13 +22,16 @@ const Grid = forwardRef(({
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
   const fetchImages = useCallback(async (rowIndex: number, signal?: AbortSignal) => {
-      const response = await fetch(`https:picsum.photos/id/${Math.floor(Math.random() * 99)}/info`,{
+    const response = selectedTopic?.id && await fetch(`https://api.unsplash.com/photos/random?topics=${selectedTopic.id}`, {
       signal,
+      headers: {
+        Authorization: `Client-ID ${import.meta.env.VITE_UNSPLASH_ACCESS_KEY}`
+      }
     })
 
     const data = await response.json()
-    const { id, download_url: url } = data
-    return { colIndex: colCount, rowIndex, url, id }
+    const { id, urls: { small } } = data
+    return { colIndex: colCount, rowIndex, url: small, id }
   }, [colCount, selectedTopic?.id])
 
   useEffect(() => {
@@ -36,25 +39,24 @@ const Grid = forwardRef(({
     const getImageData = async () => {
       try {
         const gridData = await Promise.all(Array.from({ length: rowCount }).map(async (_, rowIndex) => (
-          await Promise.all(Array.from({ length: colCount }).map(() => (
-            fetchImages(rowIndex, abortController.signal))))
+          await Promise.all(Array.from({ length: colCount }).map(async () => (
+            await fetchImages(rowIndex, abortController.signal))))
         )))
         const resolvedData = await Promise.all(gridData)
         setImageData(resolvedData)
-        return () => abortController.abort()
+        return () => { abortController.abort() }
       } catch (error) {
         console.error(error)
       }
     }
-    selectedTopic?.title && getImageData()
-  }, [selectedTopic?.title, colCount, fetchImages, rowCount])
-
+    getImageData()
+  }, [colCount, fetchImages, rowCount])
 
   const fetchBackward = async () => {
     const newImages = await Promise.all(
-      Array.from({ length: rowCount  }).map(async (_, rowIndex) => (
+      Array.from({ length: rowCount }).map(async (_, rowIndex) => (
         await fetchImages(rowIndex)
-    )))
+      )))
 
     const newData = imageData.map((rows) => {
       return rows.reduce((accum, currentCol, colIndex) => {
@@ -64,15 +66,15 @@ const Grid = forwardRef(({
     })
 
     // Add newImages to first column
-    setImageData(newData.map((col, index) => ([newImages[index],...col])))
+    setImageData(newData.map((col, index) => ([newImages[index], ...col])))
     setSelectedPositon({ col: colCount - 1, row: 0 })
   }
 
   const fetchForward = async () => {
     const newImages = await Promise.all(
-      Array.from({ length: rowCount  }).map(async (_, rowIndex) => (
+      Array.from({ length: rowCount }).map(async (_, rowIndex) => (
         await fetchImages(rowIndex)
-    )))
+      )))
 
     const newData = imageData.map((rows, rowIndex) => {
       return rows.reduce((accum, currentCol, colIndex) => {
@@ -137,7 +139,7 @@ const Grid = forwardRef(({
       ref={ref}
       tabIndex={1}
       onKeyDown={handleKeyDown}
-      className={`table w-full h-screen z-0 justify-around bg-stone-500 flex-wrap border-1 border-yellow-600`}
+      className={'table w-full h-screen z-0 justify-around bg-stone-500 flex-wrap border-1 border-yellow-600'}
     >
       {imageData.map((column, rowIndex) => (
         <div key={`row-${rowIndex}`} className='table-row'>

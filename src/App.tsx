@@ -25,12 +25,19 @@ const App = () => {
     const abortController = new AbortController()
     const fetchTopics = async () => {
       try {
-        const response = await fetch('https://random-word-api.herokuapp.com/word?number=10', {
-          signal: abortController.signal
+        const response = await fetch('https://api.unsplash.com/topics?per_page=10', {
+          signal: abortController.signal,
+          headers: {
+            Authorization: `Client-ID ${import.meta.env.VITE_UNSPLASH_ACCESS_KEY}`
+          },
         })
         const data = await response.json()
+        const initial = {
+          title: data[0].title,
+          id: data[0].id
+        }
         setTopicData(data)
-        setSelectedTopic({ index: 0, title: data[0] })
+        setSelectedTopic({ index: 0, ...initial })
       } catch (error) {
         console.error(error)
       }
