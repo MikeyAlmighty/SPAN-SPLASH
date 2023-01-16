@@ -1,4 +1,4 @@
-import { forwardRef, useState, useCallback, useEffect } from 'react'
+import { forwardRef, useState, useCallback, useEffect, KeyboardEvent } from 'react'
 
 import ProgressiveImage from '@components/progressive-image'
 import { Direction } from '@models/direction'
@@ -11,25 +11,25 @@ type GridProps = {
   onFocusLost: () => void
 }
 
-const Grid = forwardRef(({
+const Grid = forwardRef<HTMLDivElement,GridProps>(({
   colCount,
   rowCount,
   onFocusLost,
   selectedTopic
-}: GridProps, ref) => {
+}, ref) => {
   const [selectedPosition, setSelectedPositon] = useState<{ row: number, col: number }>({ row: 0, col: 0 })
 
   const [imageData, setImageData] = useState<Array<Array<{ id: string, url: string, colIndex: number, rowIndex: number }>>>([])
 
   const fetchImages = useCallback(async (rowIndex: number, signal?: AbortSignal) => {
-    const response = selectedTopic?.id && await fetch(`https://api.unsplash.com/photos/random?topics=${selectedTopic.id}`, {
+    const response = await fetch(`https://api.unsplash.com/photos/random?topics=${selectedTopic.id}`, {
       signal,
       headers: {
         Authorization: `Client-ID ${import.meta.env.VITE_UNSPLASH_ACCESS_KEY}`
       }
     })
 
-    const data = await response.json()
+    const data = selectedTopic?.id && await response.json()
     const { id, urls: { small } } = data
     return { colIndex: colCount, rowIndex, url: small, id }
   }, [colCount, selectedTopic?.id])
@@ -42,6 +42,7 @@ const Grid = forwardRef(({
           await Promise.all(Array.from({ length: colCount }).map(async () => (
             await fetchImages(rowIndex, abortController.signal))))
         )))
+
         const resolvedData = await Promise.all(gridData)
         setImageData(resolvedData)
         return () => { abortController.abort() }
@@ -59,14 +60,17 @@ const Grid = forwardRef(({
       )))
 
     const newData = imageData.map((rows) => {
+
+      // @ts-ignore
       return rows.reduce((accum, currentCol, colIndex) => {
         if (colIndex + 1 === colCount) return accum
         return [...accum, { ...currentCol, colIndex: colIndex - 1 }]
       }, [])
     })
 
-    // Add newImages to first column
-    setImageData(newData.map((col, index) => ([newImages[index], ...col])))
+    // Add newImages to last column
+    // @ts-ignore
+    setImageData(newData.map((col, index: number) => ([newImages[index], ...col])))
     setSelectedPositon({ col: colCount - 1, row: 0 })
   }
 
@@ -77,6 +81,7 @@ const Grid = forwardRef(({
       )))
 
     const newData = imageData.map((rows, rowIndex) => {
+      // @ts-ignore
       return rows.reduce((accum, currentCol, colIndex) => {
         // "Remove" images from first column
         if (colIndex === 0) return accum
@@ -84,12 +89,13 @@ const Grid = forwardRef(({
         return [...accum, currentCol]
       }, [])
     })
-    // Add newImages to last column
+    // Add newImages to first column
+    // @ts-ignore
     setImageData(newData.map((col, index) => ([...col, newImages[index]])))
     setSelectedPositon({ col: 0, row: 0 })
   }
 
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     const { key } = event
 
     event.preventDefault()
@@ -144,7 +150,7 @@ const Grid = forwardRef(({
       {imageData.map((column, rowIndex) => (
         <div key={`row-${rowIndex}`} className='table-row'>
           {column.map(({ url }, colIndex) => (
-            <div key={`row-${rowIndex}-col-${colIndex}`} className='table-cell'>
+            <div key={`row-${rowIndex}-col-${colIndex}`} className='table-cell w-84 h-64'>
               <ProgressiveImage
                 imageSrc={url}
                 selectedPosition={selectedPosition}

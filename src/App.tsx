@@ -11,15 +11,15 @@ const App = () => {
   const screenWidth = window.innerWidth
   const screenHeight = window.innerHeight
 
-  const navbarRef = useRef(null)
-  const gridRef = useRef(null)
+  const navbarRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
 
   // Calc Content Dimensions
   const rowCount = Math.floor((screenHeight / 256) / 2)
   const colCount = Math.floor(screenWidth / 440)
 
-  const [topicData, setTopicData] = useState<Array<string>>([])
-  const [selectedTopic, setSelectedTopic] = useState<TopicModel>({ index: 0 })
+  const [topicData, setTopicData] = useState<TopicModel[]>([])
+  const [selectedTopic, setSelectedTopic] = useState<TopicModel>({ id: "", index: 0, title: "" })
 
   useEffect(() => {
     const abortController = new AbortController()
@@ -32,6 +32,7 @@ const App = () => {
           },
         })
         const data = await response.json()
+
         const initial = {
           title: data[0].title,
           id: data[0].id

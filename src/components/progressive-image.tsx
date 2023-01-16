@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion'
-
 type ProgressiveImageProps = {
   currentRowIndex: number
   currentColIndex: number
@@ -21,12 +19,7 @@ export const ProgressiveImage = ({
 
   return (
     <div className='w-84 h-64 m-14'>
-      <motion.img
-        initial={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
-        animate={{
-          scale: 1.2
-        }}
+      <img
         alt={''}
         className={`w-full h-full ${active ? 'border-yellow-600' : null} border-2 rounded bg-stone-600 border-1`}
         src={imageSrc}

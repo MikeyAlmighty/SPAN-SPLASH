@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react'
+import { useState, forwardRef, KeyboardEvent } from 'react'
 
 import { Direction } from '@models/direction'
 import { TopicModel } from '@models/topics'
@@ -12,14 +12,14 @@ type NavBarProps = {
 const MAX_TOPIC_COUNT = 10
 const MIN_TOPIC_COUNT = 0
 
-const NavBar = forwardRef(({
+const NavBar = forwardRef<HTMLDivElement, NavBarProps>(({
   onTopicChange,
   topics,
   onFocusLost
-}: NavBarProps, ref) => {
+}, ref) => {
   const [selectedTopicIndex, setSelectedTopicIndex] = useState<number>(0)
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const { key } = event
 
     event.preventDefault()
