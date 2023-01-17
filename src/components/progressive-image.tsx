@@ -18,13 +18,11 @@ export const ProgressiveImage = ({
   const active = (currentRowIndex === selectedRow) && (currentColIndex === selectedCol)
 
   return (
-    <div className='w-84 h-64 m-14'>
       <img
-        alt={''}
-        className={`w-full h-full ${active ? 'border-yellow-600' : null} border-2 rounded bg-stone-600 border-1`}
+        alt={'gallery-icon'}
+        className={`w-96 m-14 h-64 object-fill ${active ? 'border-yellow-600' : null} border-2 rounded bg-stone-600 border-1`}
         src={imageSrc}
       />
-    </div>
   )
 }
 

@@ -150,7 +150,7 @@ const Grid = forwardRef<HTMLDivElement,GridProps>(({
       {imageData.map((column, rowIndex) => (
         <div key={`row-${rowIndex}`} className='table-row'>
           {column.map(({ url }, colIndex) => (
-            <div key={`row-${rowIndex}-col-${colIndex}`} className='table-cell w-84 h-64'>
+            <div key={`row-${rowIndex}-col-${colIndex}`} className='table-cell'>
               <ProgressiveImage
                 imageSrc={url}
                 selectedPosition={selectedPosition}
