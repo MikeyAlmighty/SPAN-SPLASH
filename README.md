@@ -2,6 +2,9 @@
 
 A `keyboard-first` image viewing interface which pulls images from [Unsplash.com](https://unsplash.com/).
 
+
+![Preview](docs/images/preview.png)
+
 ## Setup
 
 `npm i`
